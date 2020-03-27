@@ -27,7 +27,7 @@ func AddPlanetEndpoint(w http.ResponseWriter, req *http.Request) {
     _ = json.NewDecoder(req.Body).Decode(&planet)
     auto_id_ = auto_id_ + 1
     planet.ID = strconv.FormatInt(int64(auto_id_), 10)
-    planet.Films = GetNumFilms(getapiinfo.GetApiInformation(planet.Name))
+    planet.Films = GetNumElements(getapiinfo.GetApiInformation(planet.Name))
     planets_ = append(planets_, planet)
     json.NewEncoder(w).Encode(planets_)
 }
@@ -61,7 +61,8 @@ func DeletePlanetEndpoint(w http.ResponseWriter, req *http.Request) {
     json.NewEncoder(w).Encode(planets_)
 }
 
-func GetNumFilms(results []string) int {
+//Function to simply count elements of an array
+func GetNumElements(results []string) int {
 	i := 0
     for _, _ = range results {
 			i++

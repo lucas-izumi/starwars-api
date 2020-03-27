@@ -13,10 +13,12 @@ type ApiResponse struct {
 	Results []Results `json:"results"`
 }
 
+//Since we will only use the films field information, no need to retrieve all the data
 type Results struct {
 	Films []string `json:"films"`
 }
 
+//Adding a timeout so we dont get stuck waiting for a response
 var httpConf = http.Client{Timeout: 10 * time.Second}
 
 func GetApiInformation(pname string) []string {
@@ -45,5 +47,7 @@ func GetApiInformation(pname string) []string {
 		log.Fatal(jsonErr)
 	}
 
+	//Again, this function is only returning the information we need
+	//With simple modifications we can make it return information of any field
 	return res.Results[0].Films
 }
