@@ -6,6 +6,7 @@ import (
     "net/http"
     "github.com/gorilla/mux"
     "strings"
+    "strconv"
 )
 
 type Planet struct {
@@ -17,13 +18,14 @@ type Planet struct {
 }
 
 var planets_ []Planet
+var auto_id_ int
 
 //Add planet (name, climate, terrain)
 func AddPlanetEndpoint(w http.ResponseWriter, req *http.Request) {
-    params := mux.Vars(req)
     var planet Planet
     _ = json.NewDecoder(req.Body).Decode(&planet)
-    planet.ID = params["id"]
+    auto_id_ = auto_id_ + 1
+    planet.ID = strconv.FormatInt(int64(auto_id_), 10)
     planets_ = append(planets_, planet)
     json.NewEncoder(w).Encode(planets_)
 }
@@ -45,10 +47,23 @@ func SearchPlanetEndpoint(w http.ResponseWriter, req *http.Request) {
     json.NewEncoder(w).Encode(&Planet{})
 }
 
+//Delete a planet
+func DeletePlanetEndpoint(w http.ResponseWriter, req *http.Request) {
+    params := mux.Vars(req)
+    for index, item := range planets_ {
+        if item.ID == params["id"] {
+            planets_ = append(planets_[:index], planets_[index+1:]...)
+            break
+        }
+    }
+    json.NewEncoder(w).Encode(planets_)
+}
+
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/planets", GetPlanetsEndpoint).Methods("GET")
     router.HandleFunc("/planets/{search}", SearchPlanetEndpoint).Methods("GET")
-    router.HandleFunc("/add-planet/{id}", AddPlanetEndpoint).Methods("POST")
+    router.HandleFunc("/planets/", AddPlanetEndpoint).Methods("POST")
+    router.HandleFunc("/planets/{id}", DeletePlanetEndpoint).Methods("DELETE")
     log.Fatal(http.ListenAndServe(":12345", router))
 }
