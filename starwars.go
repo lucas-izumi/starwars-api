@@ -32,9 +32,22 @@ func GetPlanetsEndpoint(w http.ResponseWriter, req *http.Request) {
     json.NewEncoder(w).Encode(planets_)
 }
 
+//Search by ID
+func GetPlanetByIdEndpoint(w http.ResponseWriter, req *http.Request) {
+    params := mux.Vars(req)
+    for _, item := range planets_ {
+        if item.ID == params["id"] {
+            json.NewEncoder(w).Encode(item)
+            return
+        }
+    }
+    json.NewEncoder(w).Encode(&Planet{})
+}
+
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/planets", GetPlanetsEndpoint).Methods("GET")
+    router.HandleFunc("/planets/{id}", GetPlanetByIdEndpoint).Methods("GET")
     router.HandleFunc("/add-planet/{id}", AddPlanetEndpoint).Methods("POST")
     log.Fatal(http.ListenAndServe(":12345", router))
 }
