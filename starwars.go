@@ -7,6 +7,7 @@ import (
     "github.com/gorilla/mux"
     "strings"
     "strconv"
+    "starwarsrest/get_api_info"
 )
 
 type Planet struct {
@@ -14,7 +15,7 @@ type Planet struct {
     Name 	  string   `json:"name,omitempty"`
     Climate   string   `json:"climate,omitempty"`
     Terrain   string   `json:"terrain,omitempty"`
-    Films     string   `json:"films,omitempty"`
+    Films     int      `json:"films,omitempty"`
 }
 
 var planets_ []Planet
@@ -26,6 +27,7 @@ func AddPlanetEndpoint(w http.ResponseWriter, req *http.Request) {
     _ = json.NewDecoder(req.Body).Decode(&planet)
     auto_id_ = auto_id_ + 1
     planet.ID = strconv.FormatInt(int64(auto_id_), 10)
+    planet.Films = GetNumFilms(getapiinfo.GetApiInformation(planet.Name))
     planets_ = append(planets_, planet)
     json.NewEncoder(w).Encode(planets_)
 }
@@ -57,6 +59,14 @@ func DeletePlanetEndpoint(w http.ResponseWriter, req *http.Request) {
         }
     }
     json.NewEncoder(w).Encode(planets_)
+}
+
+func GetNumFilms(results []string) int {
+	i := 0
+    for _, _ = range results {
+			i++
+    }
+    return i
 }
 
 func main() {
