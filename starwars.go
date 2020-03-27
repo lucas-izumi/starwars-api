@@ -5,6 +5,7 @@ import (
     "log"
     "net/http"
     "github.com/gorilla/mux"
+    "strings"
 )
 
 type Planet struct {
@@ -32,11 +33,11 @@ func GetPlanetsEndpoint(w http.ResponseWriter, req *http.Request) {
     json.NewEncoder(w).Encode(planets_)
 }
 
-//Search by ID
-func GetPlanetByIdEndpoint(w http.ResponseWriter, req *http.Request) {
+//Search a planet either by ID or name
+func SearchPlanetEndpoint(w http.ResponseWriter, req *http.Request) {
     params := mux.Vars(req)
     for _, item := range planets_ {
-        if item.ID == params["id"] {
+        if item.ID == params["search"] || strings.EqualFold(item.Name, params["search"]) {
             json.NewEncoder(w).Encode(item)
             return
         }
@@ -47,7 +48,7 @@ func GetPlanetByIdEndpoint(w http.ResponseWriter, req *http.Request) {
 func main() {
     router := mux.NewRouter()
     router.HandleFunc("/planets", GetPlanetsEndpoint).Methods("GET")
-    router.HandleFunc("/planets/{id}", GetPlanetByIdEndpoint).Methods("GET")
+    router.HandleFunc("/planets/{search}", SearchPlanetEndpoint).Methods("GET")
     router.HandleFunc("/add-planet/{id}", AddPlanetEndpoint).Methods("POST")
     log.Fatal(http.ListenAndServe(":12345", router))
 }
